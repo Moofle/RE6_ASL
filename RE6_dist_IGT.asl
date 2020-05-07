@@ -1,5 +1,5 @@
-//Credit to xlYoshii(GitHub: JYNxYoshii), Sniffims, Jon.
-//Meant solely for IGT. 
+//Credit to xlYoshii(GitHub: JYNxYoshii), Jon.
+//Meant solely for IGT via Steam 1.06 US. 
 //LiveSplit is a bit screw-y; double-check that Comparison is set to Game Time.
 //Add in via Scriptable Auto Splitter in Layout settings.
 
@@ -16,6 +16,11 @@ state("BH6")
 	
 	float src7 : "BH6.exe", 0x13c549c, 0x41724;
 	float src8 : "BH6.exe", 0x13c549c, 0x417dc;
+
+	string1 campSlctFlg : "BH6.exe", 0x13c549c, 0x412a4;
+
+	byte slctdPlyr1 : "BH6.exe", 0x13c549c, 0x412d0;
+	byte slctdPlyr2 : "BH6.exe", 0x13c549c, 0x41294;
 }
 
 startup
@@ -26,62 +31,68 @@ startup
 	vars.aSLT = 0;
 	vars.lIGT = 0;
 	vars.lSLT = 0;
-	
-	settings.Add("leon", true, "Playing as Leon");
-	settings.Add("helena", false, "Playing as Helanal");
-	settings.Add("chris", false, "Playing as Chris");
-	settings.Add("piers", false, "Playing as Piers");
-	settings.Add("jake", false, "Playing as Jake");
-	settings.Add("sherry", false, "Playing as Sherry");
-	settings.Add("ada", false, "Playing as Ada");
-	settings.Add("agent", false, "Playing as Agent");
+	vars.cSC = "";
 }
 
 update
 {
-	if (settings["leon"]) {
+	if (current.campSlctFlg == "L") {
+		vars.cSC = "L";
+	}
+	else if (current.campSlctFlg == "V") {
+		vars.cSC = "V";
+	}
+	else if (current.campSlctFlg == "M") {
+		vars.cSC = "M";
+	}
+	else if (current.campSlctFlg == "j") {
+		vars.cSC = "j";
+	}
+
+
+	if (vars.cSC == "L" && current.slctdPlyr1 == 1) {
 		vars.aIGT = current.src1;
 		vars.aSLT = current.src2;
 		vars.lIGT = old.src1;
 		vars.lSLT = old.src2;
 	}
-	else if (settings["helena"]) {
+	else if (vars.cSC == "L" && current.slctdPlyr2 == 1) {
 		vars.aIGT = current.src2;
 		vars.aSLT = current.src1;
 		vars.lIGT = old.src2;
 		vars.lSLT = old.src1;
 	}
-	else if (settings["chris"]) {
+	else if (vars.cSC == "V" && current.slctdPlyr1 == 1) {
 		vars.aIGT = current.src3;
 		vars.aSLT = current.src4;
 		vars.lIGT = old.src3;
 		vars.lSLT = old.src4;
 	}
-	else if (settings["piers"]) {
+	else if (vars.cSC == "V" && current.slctdPlyr2 == 1) {
 		vars.aIGT = current.src4;
 		vars.aSLT = current.src3;
 		vars.lIGT = old.src4;
 		vars.lSLT = old.src3;
 	}
-	else if (settings["jake"]) {
+	else if (vars.cSC == "M" && current.slctdPlyr1 == 1) {
 		vars.aIGT = current.src5;
 		vars.aSLT = current.src6;
 		vars.lIGT = old.src5;
 		vars.lSLT = old.src6;
 	}
-	else if (settings["sherry"]) {
+	else if (vars.cSC == "M" && current.slctdPlyr2 == 1) {
 		vars.aIGT = current.src6;
 		vars.aSLT = current.src5;
 		vars.lIGT = old.src6;
 		vars.lSLT = old.src5;
 	}
-	else if (settings["ada"]) {
+	else if (vars.cSC == "j" && current.slctdPlyr1 == 1) {
 		vars.aIGT = current.src7;
 		vars.aSLT = current.src8;
 		vars.lIGT = old.src7;
 		vars.lSLT = old.src8;
 	}
-	else if (settings["agent"]) {
+	else if (vars.cSC == "j" && current.slctdPlyr2 == 1) {
 		vars.aIGT = current.src8;
 		vars.aSLT = current.src7;
 		vars.lIGT = old.src8;
