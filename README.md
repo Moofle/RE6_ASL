@@ -1,5 +1,5 @@
 # RE6_ASL
-RE6 Autosplitter for LiveSplit. Primary is for IGT only, will work on it later.
+RE6 Autosplitter for LiveSplit. IGT is done, will implement the optional chapter split later.
 
 With boredom, lockdown, and nothing to do, I've finally followed through and made an autosplitter base for Resident Evil 6. If you don't know what an autosplitter is, what it does or can do, and don't run RE6, then this probably isn't for you.
 
