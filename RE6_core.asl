@@ -62,10 +62,9 @@ state("BH6")
 	Again, because it's all in the same block, simple math is all it took to find the pointer.
 	*/
 	byte campActv : "BH6.exe", 0x13c549c, 0x412a0;
-	byte charSlctd : "BH6.exe", 0x13c549c, 0x4128c;
 	byte campSlctn : "BH6.exe", 0x13c549c, 0x41298;
 	byte memPlyrSlctd : "BH6.exe", 0x13c549c, 0x41388;
-	byte slctdPlyr1 : "BH6.exe", 0x13c549c, 0x412d0;
+	byte slctdPlyr1 : "BH6.exe", 0x13c549c, 0x4128c;
 	byte slctdPlyr2 : "BH6.exe", 0x13c549c, 0x41294;
 }
 
@@ -80,7 +79,7 @@ startup
 	vars.campSlctChar = "";
 	vars.campFlgArray = new {};
 	vars.mainSrcArray = new {};
-	vars.currentIndex = 1;
+	vars.campFlgArray = new string[4] {"L", "V", "M", "j"};
 	/*
 	settings.Add("leon", true, "Playing as Leon");
 	settings.Add("helena", false, "Playing as Helanal");
@@ -104,6 +103,8 @@ update
 	print("Src-------7: " + current.src7);
 	print("Src--------8: " + current.src8);
 	print("------------------------------");
+	print("Selected Char Pair: " + current.slctdPlyr1 + " " + current.slctdPlyr2);
+	print("------------------------------");
 	print("campSlctFlg: " + current.campSlctFlg);
 	print("campSlctChar: " + vars.campSlctChar);
 	print("------------------------------");
@@ -113,7 +114,6 @@ update
 	print("--lastSLT: " + vars.lastSLT);
 	print("------------------------------");
 
-	vars.campFlgArray = new string[4] {"L", "V", "M", "j"};
 	vars.mainSrcArray = new float[4, 2] {{current.src1, current.src2}, {current.src3, current.src4}, {current.src5, current.src6}, {current.src7, current.src8}};
 	vars.pastSrcArray = new float[4, 2] {{old.src1, old.src2}, {old.src3, old.src4}, {old.src5, old.src6}, {old.src7, old.src8}};
 
@@ -129,28 +129,53 @@ then returns the respective position or index of that matched item as a number.
 
 I cannot think of how to get it working.
 */
-	foreach (string i in vars.campFlgArray)
-	{
-		if (current.campSlctFlg == i) {
-			vars.campSlctChar = i;
-			vars.currentIndex = i.Length;
-			print("-_-_Current Iterative: " + i);
-		}
+	for (int i = 0; i < 4; ++i) {
+    	if (current.campSlctFlg == vars.campFlgArray[i]) {
+        	vars.campSlctChar = vars.campFlgArray[i];
+        	print("-_-_Current Iterative: " + vars.campSlctChar);
+        	print("_-_-Current I.Index: " + i);
+    	}
 
-		if (vars.campSlctChar == i && current.slctdPlyr1 == 1) {
-			vars.actIGT = vars.mainSrcArray[vars.currentIndex, 1];
-			vars.actSLT = vars.mainSrcArray[vars.numIndex, 2];
-			vars.lastIGT = vars.pastSrcArray[vars.numIndex, 1];
-			vars.lastSLT = vars.pastSrcArray[vars.numIndex, 2];
-		}
+    	if (vars.campSlctChar == vars.campFlgArray[i] 
+			&& current.slctdPlyr1 == 1) {
+        	vars.actIGT = vars.mainSrcArray[i, 0];
+        	vars.actSLT = vars.mainSrcArray[i, 1];
+        	vars.lastIGT = vars.pastSrcArray[i, 0];
+        	vars.lastSLT = vars.pastSrcArray[i, 1];
+    	}
 
-		else if (vars.campSlctChar == i && current.slctdPlyr2 == 1) {
-			vars.actIGT = vars.mainSrcArray[vars.numIndex, 2];
-			vars.actSLT = vars.mainSrcArray[vars.numIndex, 1];
-			vars.lastIGT = vars.pastSrcArray[vars.numIndex, 2];
-			vars.lastSLT = vars.pastSrcArray[vars.numIndex, 1];
-		}
+    	else if (vars.campSlctChar == vars.campFlgArray[i] 
+				 && current.slctdPlyr2 == 1) {
+        	vars.actIGT = vars.mainSrcArray[i, 1];
+        	vars.actSLT = vars.mainSrcArray[i, 0];
+        	vars.lastIGT = vars.pastSrcArray[i, 1];
+        	vars.lastSLT = vars.pastSrcArray[i, 0];
+    	}
 	}
+
+	/*foreach (string s in vars.campFlgArray)
+	{
+		if (current.campSlctFlg == s) {
+			vars.campSlctChar = s;
+			vars.currentIndex = s.Length;
+			print("-_-_Current Iterative: " + s);
+			print("_-_-Current I.Index: " + vars.currentIndex);
+		}
+
+		if (vars.campSlctChar == s && current.slctdPlyr1 == 1) {
+			vars.actIGT = vars.mainSrcArray[vars.currentIndex, 0];
+			vars.actSLT = vars.mainSrcArray[vars.currentIndex, 1];
+			vars.lastIGT = vars.pastSrcArray[vars.currentIndex, 0];
+			vars.lastSLT = vars.pastSrcArray[vars.currentIndex, 1];
+		}
+
+		else if (vars.campSlctChar == s && current.slctdPlyr2 == 1) {
+			vars.actIGT = vars.mainSrcArray[vars.currentIndex, 1];
+			vars.actSLT = vars.mainSrcArray[vars.currentIndex, 0];
+			vars.lastIGT = vars.pastSrcArray[vars.currentIndex, 1];
+			vars.lastSLT = vars.pastSrcArray[vars.currentIndex, 0];
+		}
+	}*/
 	
 	/*if (current.campSlctFlg == "L") {
 		vars.campSlctChar = "L";
