@@ -19,7 +19,7 @@ state("BH6")
 
 	string1 campSlctFlg : "BH6.exe", 0x13c549c, 0x412a4;
 
-	byte slctdPlyr1 : "BH6.exe", 0x13c549c, 0x412d0;
+	byte slctdPlyr1 : "BH6.exe", 0x13c549c, 0x4128c;
 	byte slctdPlyr2 : "BH6.exe", 0x13c549c, 0x41294;
 }
 
@@ -27,82 +27,49 @@ startup
 {
 	refreshRate = 30;
 	vars.gtBuffer = 0;
-	vars.aIGT = 0;
-	vars.aSLT = 0;
-	vars.lIGT = 0;
-	vars.lSLT = 0;
-	vars.cSC = "";
+	vars.actIGT = 0;
+	vars.actSLT = 0;
+	vars.lastIGT = 0;
+	vars.lastSLT = 0;
+	vars.campSlctChar = "";
+	vars.campFlgArray = new {};
+	vars.mainSrcArray = new {};
+	vars.campFlgArray = new string[4] {"L", "V", "M", "j"};
 }
 
 update
 {
-	if (current.campSlctFlg == "L") {
-		vars.cSC = "L";
-	}
-	else if (current.campSlctFlg == "V") {
-		vars.cSC = "V";
-	}
-	else if (current.campSlctFlg == "M") {
-		vars.cSC = "M";
-	}
-	else if (current.campSlctFlg == "j") {
-		vars.cSC = "j";
-	}
+	vars.mainSrcArray = new float[4, 2] {{current.src1, current.src2}, {current.src3, current.src4}, {current.src5, current.src6}, {current.src7, current.src8}};
+	vars.pastSrcArray = new float[4, 2] {{old.src1, old.src2}, {old.src3, old.src4}, {old.src5, old.src6}, {old.src7, old.src8}};
 
+	for (int i = 0; i < 4; ++i) {
+    	if (current.campSlctFlg == vars.campFlgArray[i]) {
+        	vars.campSlctChar = vars.campFlgArray[i];
+        	print("-_-_Current Iterative: " + vars.campSlctChar);
+        	print("_-_-Current I.Index: " + i);
+    	}
 
-	if (vars.cSC == "L" && current.slctdPlyr1 == 1) {
-		vars.aIGT = current.src1;
-		vars.aSLT = current.src2;
-		vars.lIGT = old.src1;
-		vars.lSLT = old.src2;
-	}
-	else if (vars.cSC == "L" && current.slctdPlyr2 == 1) {
-		vars.aIGT = current.src2;
-		vars.aSLT = current.src1;
-		vars.lIGT = old.src2;
-		vars.lSLT = old.src1;
-	}
-	else if (vars.cSC == "V" && current.slctdPlyr1 == 1) {
-		vars.aIGT = current.src3;
-		vars.aSLT = current.src4;
-		vars.lIGT = old.src3;
-		vars.lSLT = old.src4;
-	}
-	else if (vars.cSC == "V" && current.slctdPlyr2 == 1) {
-		vars.aIGT = current.src4;
-		vars.aSLT = current.src3;
-		vars.lIGT = old.src4;
-		vars.lSLT = old.src3;
-	}
-	else if (vars.cSC == "M" && current.slctdPlyr1 == 1) {
-		vars.aIGT = current.src5;
-		vars.aSLT = current.src6;
-		vars.lIGT = old.src5;
-		vars.lSLT = old.src6;
-	}
-	else if (vars.cSC == "M" && current.slctdPlyr2 == 1) {
-		vars.aIGT = current.src6;
-		vars.aSLT = current.src5;
-		vars.lIGT = old.src6;
-		vars.lSLT = old.src5;
-	}
-	else if (vars.cSC == "j" && current.slctdPlyr1 == 1) {
-		vars.aIGT = current.src7;
-		vars.aSLT = current.src8;
-		vars.lIGT = old.src7;
-		vars.lSLT = old.src8;
-	}
-	else if (vars.cSC == "j" && current.slctdPlyr2 == 1) {
-		vars.aIGT = current.src8;
-		vars.aSLT = current.src7;
-		vars.lIGT = old.src8;
-		vars.lSLT = old.src7;
+    	if (vars.campSlctChar == vars.campFlgArray[i] 
+			&& current.slctdPlyr1 == 1) {
+        	vars.actIGT = vars.mainSrcArray[i, 0];
+        	vars.actSLT = vars.mainSrcArray[i, 1];
+        	vars.lastIGT = vars.pastSrcArray[i, 0];
+        	vars.lastSLT = vars.pastSrcArray[i, 1];
+    	}
+
+    	else if (vars.campSlctChar == vars.campFlgArray[i] 
+				 && current.slctdPlyr2 == 1) {
+        	vars.actIGT = vars.mainSrcArray[i, 1];
+        	vars.actSLT = vars.mainSrcArray[i, 0];
+        	vars.lastIGT = vars.pastSrcArray[i, 1];
+        	vars.lastSLT = vars.pastSrcArray[i, 0];
+    	}
 	}
 }
 
 start
 {
-	if (vars.aIGT > vars.lIGT && vars.lIGT == 0 && vars.aSLT > vars.lSLT && vars.lSLT == 0) {
+	if (vars.actIGT > vars.lastIGT && vars.lastIGT == 0 && vars.actSLT > vars.lastSLT && vars.lastSLT == 0) {
 		vars.gtBuffer = 0;
 		return true;
 	}
@@ -116,16 +83,16 @@ isLoading
 
 gameTime
 {
-	if (vars.aIGT == 0 && vars.lIGT > 0) {
-		vars.gtBuffer = vars.gtBuffer + vars.lIGT;
+	if (vars.actIGT == 0 && vars.lastIGT > 0) {
+		vars.gtBuffer = vars.gtBuffer + vars.lastIGT;
 	}
 	
-	return TimeSpan.FromSeconds(System.Convert.ToDouble(vars.gtBuffer + vars.aIGT));
+	return TimeSpan.FromSeconds(System.Convert.ToDouble(vars.gtBuffer + vars.actIGT));
 }
 
 reset
 {
-	if (vars.aIGT < vars.lIGT && vars.aIGT > 0 && vars.lSLT == 0) {
+	if (vars.actIGT < vars.lastIGT && vars.actIGT > 0 && vars.lastSLT == 0) {
 		return true;
 	}
 }
