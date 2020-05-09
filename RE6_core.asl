@@ -73,11 +73,14 @@ startup
 {
 	refreshRate = 30;
 	vars.gtBuffer = 0;
-	vars.aIGT = 0;
-	vars.aSLT = 0;
-	vars.lIGT = 0;
-	vars.lSLT = 0;
-	vars.cSC = "";
+	vars.actIGT = 0;
+	vars.actSLT = 0;
+	vars.lastIGT = 0;
+	vars.lastSLT = 0;
+	vars.campSlctChar = "";
+	vars.campFlgArray = new {};
+	vars.mainSrcArray = new {};
+	vars.currentIndex = 1;
 	/*
 	settings.Add("leon", true, "Playing as Leon");
 	settings.Add("helena", false, "Playing as Helanal");
@@ -101,122 +104,165 @@ update
 	print("Src-------7: " + current.src7);
 	print("Src--------8: " + current.src8);
 	print("------------------------------");
-	print("CampSlctFlg: " + current.campSlctFlg);
-	print("cSC: " + vars.cSC);
+	print("campSlctFlg: " + current.campSlctFlg);
+	print("campSlctChar: " + vars.campSlctChar);
 	print("------------------------------");
-	print("---aIGT: " + vars.aIGT);
-	print("--aSLT: " + vars.aSLT);
-	print("---lIGT: " + vars.lIGT);
-	print("--lSLT: " + vars.lSLT);
+	print("---actIGT: " + vars.actIGT);
+	print("--actSLT: " + vars.actSLT);
+	print("---lastIGT: " + vars.lastIGT);
+	print("--lastSLT: " + vars.lastSLT);
+	print("------------------------------");
 
-	if (current.campSlctFlg == "L") {
-		vars.cSC = "L";
+	vars.campFlgArray = new string[4] {"L", "V", "M", "j"};
+	vars.mainSrcArray = new float[4, 2] {{current.src1, current.src2}, {current.src3, current.src4}, {current.src5, current.src6}, {current.src7, current.src8}};
+	vars.pastSrcArray = new float[4, 2] {{old.src1, old.src2}, {old.src3, old.src4}, {old.src5, old.src6}, {old.src7, old.src8}};
+
+
+/*
+I decided to give it a go and condense everything into a loop/array combo.
+The first if statement defines the constant campaign flag and works just fine.
+The following two if statements appear to function for designating the timing pairs from
+the pre-conceived array above, but the problem is that I need to take the current
+campaign flag and somehow pull it as an integer to plug into the multi-dimensional array.
+Meaning, it re-checks for a match from the constant flag variable against the flag array,
+then returns the respective position or index of that matched item as a number.
+
+I cannot think of how to get it working.
+*/
+	foreach (string i in vars.campFlgArray)
+	{
+		if (current.campSlctFlg == i) {
+			vars.campSlctChar = i;
+			vars.currentIndex = i.Length;
+			print("-_-_Current Iterative: " + i);
+		}
+
+		if (vars.campSlctChar == i && current.slctdPlyr1 == 1) {
+			vars.actIGT = vars.mainSrcArray[vars.currentIndex, 1];
+			vars.actSLT = vars.mainSrcArray[vars.numIndex, 2];
+			vars.lastIGT = vars.pastSrcArray[vars.numIndex, 1];
+			vars.lastSLT = vars.pastSrcArray[vars.numIndex, 2];
+		}
+
+		else if (vars.campSlctChar == i && current.slctdPlyr2 == 1) {
+			vars.actIGT = vars.mainSrcArray[vars.numIndex, 2];
+			vars.actSLT = vars.mainSrcArray[vars.numIndex, 1];
+			vars.lastIGT = vars.pastSrcArray[vars.numIndex, 2];
+			vars.lastSLT = vars.pastSrcArray[vars.numIndex, 1];
+		}
+	}
+	
+	/*if (current.campSlctFlg == "L") {
+		vars.campSlctChar = "L";
 	}
 	else if (current.campSlctFlg == "V") {
-		vars.cSC = "V";
+		vars.campSlctChar = "V";
 	}
 	else if (current.campSlctFlg == "M") {
-		vars.cSC = "M";
+		vars.campSlctChar = "M";
 	}
 	else if (current.campSlctFlg == "j") {
-		vars.cSC = "j";
-	}
+		vars.campSlctChar = "j";
+	}*/
 
-	if (vars.cSC == "L" && current.slctdPlyr1 == 1) {
-		vars.aIGT = current.src1;
-		vars.aSLT = current.src2;
-		vars.lIGT = old.src1;
-		vars.lSLT = old.src2;
+	
+
+	/*if (vars.campSlctChar == "L" && current.slctdPlyr1 == 1) {
+		vars.actIGT = current.src1;
+		vars.actSLT = current.src2;
+		vars.lastIGT = old.src1;
+		vars.lastSLT = old.src2;
 	}
-	else if (vars.cSC == "L" && current.slctdPlyr2 == 1) {
-		vars.aIGT = current.src2;
-		vars.aSLT = current.src1;
-		vars.lIGT = old.src2;
-		vars.lSLT = old.src1;
+	else if (vars.campSlctChar == "L" && current.slctdPlyr2 == 1) {
+		vars.actIGT = current.src2;
+		vars.actSLT = current.src1;
+		vars.lastIGT = old.src2;
+		vars.lastSLT = old.src1;
 	}
-	else if (vars.cSC == "V" && current.slctdPlyr1 == 1) {
-		vars.aIGT = current.src3;
-		vars.aSLT = current.src4;
-		vars.lIGT = old.src3;
-		vars.lSLT = old.src4;
+	else if (vars.campSlctChar == "V" && current.slctdPlyr1 == 1) {
+		vars.actIGT = current.src3;
+		vars.actSLT = current.src4;
+		vars.lastIGT = old.src3;
+		vars.lastSLT = old.src4;
 	}
-	else if (vars.cSC == "V" && current.slctdPlyr2 == 1) {
-		vars.aIGT = current.src4;
-		vars.aSLT = current.src3;
-		vars.lIGT = old.src4;
-		vars.lSLT = old.src3;
+	else if (vars.campSlctChar == "V" && current.slctdPlyr2 == 1) {
+		vars.actIGT = current.src4;
+		vars.actSLT = current.src3;
+		vars.lastIGT = old.src4;
+		vars.lastSLT = old.src3;
 	}
-	else if (vars.cSC == "M" && current.slctdPlyr1 == 1) {
-		vars.aIGT = current.src5;
-		vars.aSLT = current.src6;
-		vars.lIGT = old.src5;
-		vars.lSLT = old.src6;
+	else if (vars.campSlctChar == "M" && current.slctdPlyr1 == 1) {
+		vars.actIGT = current.src5;
+		vars.actSLT = current.src6;
+		vars.lastIGT = old.src5;
+		vars.lastSLT = old.src6;
 	}
-	else if (vars.cSC == "M" && current.slctdPlyr2 == 1) {
-		vars.aIGT = current.src6;
-		vars.aSLT = current.src5;
-		vars.lIGT = old.src6;
-		vars.lSLT = old.src5;
+	else if (vars.campSlctChar == "M" && current.slctdPlyr2 == 1) {
+		vars.actIGT = current.src6;
+		vars.actSLT = current.src5;
+		vars.lastIGT = old.src6;
+		vars.lastSLT = old.src5;
 	}
-	else if (vars.cSC == "j" && current.slctdPlyr1 == 1) {
-		vars.aIGT = current.src7;
-		vars.aSLT = current.src8;
-		vars.lIGT = old.src7;
-		vars.lSLT = old.src8;
+	else if (vars.campSlctChar == "j" && current.slctdPlyr1 == 1) {
+		vars.actIGT = current.src7;
+		vars.actSLT = current.src8;
+		vars.lastIGT = old.src7;
+		vars.lastSLT = old.src8;
 	}
-	else if (vars.cSC == "j" && current.slctdPlyr2 == 1) {
-		vars.aIGT = current.src8;
-		vars.aSLT = current.src7;
-		vars.lIGT = old.src8;
-		vars.lSLT = old.src7;
-	}
+	else if (vars.campSlctChar == "j" && current.slctdPlyr2 == 1) {
+		vars.actIGT = current.src8;
+		vars.actSLT = current.src7;
+		vars.lastIGT = old.src8;
+		vars.lastSLT = old.src7;
+	}*/
+
 	/*if (settings["leon"]) {
-		vars.aIGT = current.src1;
-		vars.aSLT = current.src2;
-		vars.lIGT = old.src1;
-		vars.lSLT = old.src2;
+		vars.actIGT = current.src1;
+		vars.actSLT = current.src2;
+		vars.lastIGT = old.src1;
+		vars.lastSLT = old.src2;
 	}
 	else if (settings["helena"]) {
-		vars.aIGT = current.src2;
-		vars.aSLT = current.src1;
-		vars.lIGT = old.src2;
-		vars.lSLT = old.src1;
+		vars.actIGT = current.src2;
+		vars.actSLT = current.src1;
+		vars.lastIGT = old.src2;
+		vars.lastSLT = old.src1;
 	}
 	else if (settings["chris"]) {
-		vars.aIGT = current.src3;
-		vars.aSLT = current.src4;
-		vars.lIGT = old.src3;
-		vars.lSLT = old.src4;
+		vars.actIGT = current.src3;
+		vars.actSLT = current.src4;
+		vars.lastIGT = old.src3;
+		vars.lastSLT = old.src4;
 	}
 	else if (settings["piers"]) {
-		vars.aIGT = current.src4;
-		vars.aSLT = current.src3;
-		vars.lIGT = old.src4;
-		vars.lSLT = old.src3;
+		vars.actIGT = current.src4;
+		vars.actSLT = current.src3;
+		vars.lastIGT = old.src4;
+		vars.lastSLT = old.src3;
 	}
 	else if (settings["jake"]) {
-		vars.aIGT = current.src5;
-		vars.aSLT = current.src6;
-		vars.lIGT = old.src5;
-		vars.lSLT = old.src6;
+		vars.actIGT = current.src5;
+		vars.actSLT = current.src6;
+		vars.lastIGT = old.src5;
+		vars.lastSLT = old.src6;
 	}
 	else if (settings["sherry"]) {
-		vars.aIGT = current.src6;
-		vars.aSLT = current.src5;
-		vars.lIGT = old.src6;
-		vars.lSLT = old.src5;
+		vars.actIGT = current.src6;
+		vars.actSLT = current.src5;
+		vars.lastIGT = old.src6;
+		vars.lastSLT = old.src5;
 	}
 	else if (settings["ada"]) {
-		vars.aIGT = current.src7;
-		vars.aSLT = current.src8;
-		vars.lIGT = old.src7;
-		vars.lSLT = old.src8;
+		vars.actIGT = current.src7;
+		vars.actSLT = current.src8;
+		vars.lastIGT = old.src7;
+		vars.lastSLT = old.src8;
 	}
 	else if (settings["agent"]) {
-		vars.aIGT = current.src8;
-		vars.aSLT = current.src7;
-		vars.lIGT = old.src8;
-		vars.lSLT = old.src7;
+		vars.actIGT = current.src8;
+		vars.actSLT = current.src7;
+		vars.lastIGT = old.src8;
+		vars.lastSLT = old.src7;
 	}*/
 }
 
@@ -224,12 +270,12 @@ start
 {
 	/*If src1 and src2 start from 0 and uptick, start the clock and init variable.*/
 	/*V1 METHOD-----
-	if (current.aIGT > old.aIGT && old.aIGT == 0 && current.aSLT > old.aSLT && old.aSLT == 0) {
+	if (current.actIGT > old.actIGT && old.actIGT == 0 && current.actSLT > old.actSLT && old.actSLT == 0) {
 		vars.gtBuffer = 0;
 		return true;
 	}*/
 	
-	if (vars.aIGT > vars.lIGT && vars.lIGT == 0 && vars.aSLT > vars.lSLT && vars.lSLT == 0) {
+	if (vars.actIGT > vars.lastIGT && vars.lastIGT == 0 && vars.actSLT > vars.lastSLT && vars.lastSLT == 0) {
 		vars.gtBuffer = 0;
 		return true;
 	}
@@ -239,19 +285,19 @@ start
 isLoading
 {
 	/*Used primarily for testing, went for direct src1 after discrepancies were noticed.*/
-	/*if (current.aIGT > old.aIGT && current.aSLT == 0) {
+	/*if (current.actIGT > old.actIGT && current.actSLT == 0) {
 		return true;
 	}
 	
-	else if (current.aIGT == 0 && current.aSLT == 0) {
+	else if (current.actIGT == 0 && current.actSLT == 0) {
 		return true;
 	}
 	
-	else if (current.aIGT == old.aIGT) {
+	else if (current.actIGT == old.actIGT) {
 		return true;
 	}
 	
-	if (current.aIGT > old.aIGT && current.aSLT == 0 || current.aIGT == 0 && current.aSLT == 0) {
+	if (current.actIGT > old.actIGT && current.actSLT == 0 || current.actIGT == 0 && current.actSLT == 0) {
 		return true;
 	}*/
 	
@@ -263,30 +309,30 @@ gameTime
 	/*Shamelessly pulled from the RE5 ASL on SRC. Unsure about the necessity
 	of the first statement, but it seems to work fine.*/
 	/*V1 METHOD-----
-	if (current.aIGT == 0 && old.aIGT > 0) {
-		vars.gtBuffer = vars.gtBuffer + old.aIGT;
+	if (current.actIGT == 0 && old.actIGT > 0) {
+		vars.gtBuffer = vars.gtBuffer + old.actIGT;
 	}
-	return TimeSpan.FromSeconds(System.Convert.ToDouble(vars.gtBuffer + current.aIGT));*/
+	return TimeSpan.FromSeconds(System.Convert.ToDouble(vars.gtBuffer + current.actIGT));*/
 	
-	if (vars.aIGT == 0 && vars.lIGT > 0) {
-		vars.gtBuffer = vars.gtBuffer + vars.lIGT;
+	if (vars.actIGT == 0 && vars.lastIGT > 0) {
+		vars.gtBuffer = vars.gtBuffer + vars.lastIGT;
 	}
 	
-	return TimeSpan.FromSeconds(System.Convert.ToDouble(vars.gtBuffer + vars.aIGT));
+	return TimeSpan.FromSeconds(System.Convert.ToDouble(vars.gtBuffer + vars.actIGT));
 }
 
 reset
 {
 	/*What we have as src1 behaves a bit weirdly. On return to menu, it switches
 	to some random value before zeroing out when you select a campaign. So,
-	if the aIGT drops to a low value and is greater than zero, AND the aSLT is 0, then reset
+	if the actIGT drops to a low value and is greater than zero, AND the actSLT is 0, then reset
 	since you're in the main menu.*/
 	/*V1 METHOD-----
-	if (current.aIGT < old.aIGT && current.aIGT > 0 && current.aSLT == 0) {
+	if (current.actIGT < old.actIGT && current.actIGT > 0 && current.actSLT == 0) {
 		return true;
 	}*/
 	
-	if (vars.aIGT < vars.lIGT && vars.aIGT > 0 && vars.lSLT == 0) {
+	if (vars.actIGT < vars.lastIGT && vars.actIGT > 0 && vars.lastSLT == 0) {
 		return true;
 	}
 }
