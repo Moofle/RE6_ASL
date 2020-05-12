@@ -19,7 +19,11 @@ state("BH6")
 
 	string1 campSlctFlg : "BH6.exe", 0x13c549c, 0x412a4;
 
-	byte slctdPlyr1 : "BH6.exe", 0x13c549c, 0x4128c;
+	byte charSlctLeon : "BH6.exe", 0x13c549c, 0x412d0;
+	byte charSlctChris : "BH6.exe", 0x13c549c, 0x41440;
+	byte charSlctJake : "BH6.exe", 0x13c549c, 0x415b0;
+	byte charSlctAda : "BH6.exe", 0x13c549c, 0x41720;
+
 	byte slctdPlyr2 : "BH6.exe", 0x13c549c, 0x41294;
 }
 
@@ -31,14 +35,14 @@ startup
 	vars.actSLT = 0;
 	vars.lastIGT = 0;
 	vars.lastSLT = 0;
+	vars.charSlctP1 = 0;
 	vars.campSlctChar = "";
-	vars.campFlgArray = new {};
-	vars.mainSrcArray = new {};
 	vars.campFlgArray = new string[4] {"L", "V", "M", "j"};
 }
 
 update
 {
+	vars.p1Array = new byte[4] {current.charSlctLeon, current.charSlctChris, current.charSlctJake, current.charSlctAda};
 	vars.mainSrcArray = new float[4, 2] {{current.src1, current.src2}, {current.src3, current.src4}, {current.src5, current.src6}, {current.src7, current.src8}};
 	vars.pastSrcArray = new float[4, 2] {{old.src1, old.src2}, {old.src3, old.src4}, {old.src5, old.src6}, {old.src7, old.src8}};
 
@@ -49,8 +53,16 @@ update
         	print("_-_-Current I.Index: " + i);
     	}
 
+		if (vars.p1Array[i] == 1) {
+			vars.charSlctP1 = vars.p1Array[i];
+			print("_---_Current charSlctP1: " + vars.charSlctP1);
+		}
+		else {
+			vars.charSlctP1 = 0;
+		}
+
     	if (vars.campSlctChar == vars.campFlgArray[i] 
-			&& current.slctdPlyr1 == 1) {
+			&& vars.charSlctP1 == 1) {
         	vars.actIGT = vars.mainSrcArray[i, 0];
         	vars.actSLT = vars.mainSrcArray[i, 1];
         	vars.lastIGT = vars.pastSrcArray[i, 0];
@@ -58,7 +70,7 @@ update
     	}
 
     	else if (vars.campSlctChar == vars.campFlgArray[i] 
-				 && current.slctdPlyr2 == 1) {
+				&& current.slctdPlyr2 == 1) {
         	vars.actIGT = vars.mainSrcArray[i, 1];
         	vars.actSLT = vars.mainSrcArray[i, 0];
         	vars.lastIGT = vars.pastSrcArray[i, 1];
