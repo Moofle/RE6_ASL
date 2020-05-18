@@ -28,6 +28,9 @@ startup {
 	vars.lastIGT = 0;
 	vars.lastSLT = 0;
 	vars.currntCamp = 0;
+	vars.timeProxy = 0;
+	vars.timeProxy2 = 0;
+	vars.timeAdjProxy = 0;
 	vars.campCurrntSlctd = new byte[4] {0, 1, 2, 3};
 
 	settings.Add("infosection", true, "|---Information---|");
@@ -50,6 +53,17 @@ update {
         	print("_-_-Current I.Index: " + i);
     	}
 
+		if (vars.currntCamp == 3) {
+			vars.timeAdjProxy = vars.currntCamp - 1;
+			vars.timeProxy = vars.mainSrcArray[vars.timeAdjProxy, 0];
+			vars.timeProxy2 = vars.pastSrcArray[vars.timeAdjProxy, 0];
+		}
+		else {
+			vars.timeAdjProxy = vars.currntCamp + 1;
+			vars.timeProxy = vars.mainSrcArray[vars.timeAdjProxy, 0];
+			vars.timeProxy2 = vars.pastSrcArray[vars.timeAdjProxy, 0];
+		}
+
     	if (vars.currntCamp == vars.campCurrntSlctd[i] 
 			&& current.slctdPlyr == 0) {
         	vars.actIGT = vars.mainSrcArray[i, 0];
@@ -57,7 +71,6 @@ update {
         	vars.lastIGT = vars.pastSrcArray[i, 0];
         	vars.lastSLT = vars.pastSrcArray[i, 1];
     	}
-
     	else if (vars.currntCamp == vars.campCurrntSlctd[i] 
 				&& current.slctdPlyr == 1) {
         	vars.actIGT = vars.mainSrcArray[i, 1];
@@ -94,7 +107,8 @@ split {
 	if (vars.actIGT == 0 && 
 		vars.actSLT == 0 && 
 		vars.lastIGT > vars.actIGT && 
-		vars.lastSLT > vars.actSLT) {
+		vars.lastSLT > vars.actSLT &&
+		vars.timeProxy == vars.timeProxy2) {
 			return true;
 	}
 }
