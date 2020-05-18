@@ -27,7 +27,6 @@ startup {
 	vars.actSLT = 0;
 	vars.lastIGT = 0;
 	vars.lastSLT = 0;
-	vars.charSlctP1 = 0;
 	vars.currntCamp = 0;
 	vars.campCurrntSlctd = new byte[4] {0, 1, 2, 3};
 
@@ -70,9 +69,12 @@ update {
 }
 
 start {
-	if (vars.actIGT > vars.lastIGT && vars.lastIGT == 0 && vars.actSLT > vars.lastSLT && vars.lastSLT == 0) {
-		vars.gtBuffer = 0;
-		return true;
+	if (vars.actIGT > vars.lastIGT && 
+		vars.lastIGT == 0 && 
+		vars.actSLT > vars.lastSLT && 
+		vars.lastSLT == 0) {
+			vars.gtBuffer = 0;
+			return true;
 	}
 }
 
@@ -86,6 +88,15 @@ gameTime {
 	}
 	
 	return TimeSpan.FromSeconds(System.Convert.ToDouble(vars.gtBuffer + vars.actIGT));
+}
+
+split {
+	if (vars.actIGT == 0 && 
+		vars.actSLT == 0 && 
+		vars.lastIGT > vars.actIGT && 
+		vars.lastSLT > vars.actSLT) {
+			return true;
+	}
 }
 
 reset {
