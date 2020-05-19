@@ -55,14 +55,13 @@ update {
 
 		if (vars.currntCamp == 3) {
 			vars.timeAdjProxy = vars.currntCamp - 1;
-			vars.timeProxy = vars.mainSrcArray[vars.timeAdjProxy, 0];
-			vars.timeProxy2 = vars.pastSrcArray[vars.timeAdjProxy, 0];
 		}
 		else {
 			vars.timeAdjProxy = vars.currntCamp + 1;
-			vars.timeProxy = vars.mainSrcArray[vars.timeAdjProxy, 0];
-			vars.timeProxy2 = vars.pastSrcArray[vars.timeAdjProxy, 0];
 		}
+
+		vars.timeProxy = vars.mainSrcArray[vars.timeAdjProxy, 0];
+		vars.timeProxy2 = vars.pastSrcArray[vars.timeAdjProxy, 0];
 
     	if (vars.currntCamp == vars.campCurrntSlctd[i] 
 			&& current.slctdPlyr == 0) {
