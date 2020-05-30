@@ -17,8 +17,14 @@ state("BH6") {
 	float src8 : "BH6.exe", 0x13c549c, 0x417dc;
 
 	byte pSlctdCampAsByte : "BH6.exe", 0x13c549c, 0x41290;
+	string1 pCSF : "BH6.exe", 0x13c549c, 0x412a4;
+	ushort pCurrntLvl : "BH6.exe", 0x13c549c, 0x412a4;
 	byte pSlctdPlyr : "BH6.exe", 0x13c549c, 0x41294;
 	byte pCampaignDifficulty : "BH6.exe", 0x13c549c, 0x412a0;
+}
+
+init {
+	current.lvl = 0;
 }
 
 startup {
@@ -37,25 +43,62 @@ startup {
 	vars.timeProxy2 = 0;
 	vars.timeAdjProxy = 0;
 
+//Level maps for the campaigns. Should not include cutscenes, more to test.
+	vars.LvlMap = new List<int> {104, 105, 101, 102, 103, 
+								210, 200, 201, 202, 279, 209, 
+								203, 204, 206, 250, 
+								552, 510, 511, 512, 514, 
+								770, 701, 706, 702, 773, 
+								500, 501, 502, 503, 
+								300, 301, 302, 303, 
+								504, 506, 507, 508, 512, 550, 
+								800, 801, 872, 851, 
+								901, 902, 972, 903, 
+								304, 305, 307, 302, 306, 
+								400, 401, 402, 
+								600, 601, 602, 
+								551, 506, 515, 579, 510, 578, 
+								904, 902, 905, 950, 
+								1000, 1001, 1003, 
+								207, 203, 272, 
+								574, 509, 516, 578, 
+								802, 871, 804, 
+								751, 706, 703, 702};
+	vars.currntLvlCheck = false;
+
+	settings.Add("optionals", false, "|---Optional Features---|");
+	settings.CurrentDefaultParent = "optionals";
+	settings.Add("opt0", false, "Enable splitting by sub-chapters (1-1, 1-2, etc.)");
+	settings.Add("opt1", false, "[ToBeImplemented]Enable splitting by sub-chapters AND cutscenes");
+
+	settings.CurrentDefaultParent = null;
 	settings.Add("infosection", true, "|---Information---|");
 	settings.CurrentDefaultParent = "infosection";
 	settings.Add("inf0", true, "Resident Evil 6 Autosplitter by xlYoshii");
-	settings.Add("inf1", true, "Runs on IGT, chapter split to hopefully come soon, always set your timing method to Game Time.");
+	settings.Add("inf1", true, "Runs on IGT, chapter split is in, always set your timing method to Game Time.");
 	settings.Add("inf2", true, "If you have issues, leave a message on the respective SR.C thread or file an issue on the Github repo @JYNxYoshii.");
 	settings.Add("inf3", true, "If you would like to help, submit your changes however you want and I'll credit you.");
 	settings.Add("inf4", true, "Site: https://github.com/JYNxYoshii/RE6_ASL");
 }
 
 update {
+	//MUST be put here, in the Update state or the loop doesn't actually recognize anything from these arrays and will NOT error out. Seriously, fuck ASL/C#.
 	vars.mainSrcArray = new float[4, 2] {{current.src1, current.src2}, {current.src3, current.src4}, {current.src5, current.src6}, {current.src7, current.src8}};
 	vars.pastSrcArray = new float[4, 2] {{old.src1, old.src2}, {old.src3, old.src4}, {old.src5, old.src6}, {old.src7, old.src8}};
 
 	for (int i = 0; i < 4; ++i) {
     	if (current.pSlctdCampAsByte == vars.campCurrntSlctd[i]) {
         	vars.currntCamp = vars.campCurrntSlctd[i];
-        	print("-_-_Current Iterative: " + vars.currntCamp);
-        	print("_-_-Current I.Index: " + i);
     	}
+
+		if (settings["opt0"] == true) {
+			if (current.pCurrntLvl != old.pCurrntLvl && vars.LvlMap.Contains(current.pCurrntLvl)) {
+				vars.currntLvlCheck = true;
+			}
+			else {
+				vars.currntLvlCheck = false;
+			}
+		}
 
 		if (vars.currntCamp == 3) {
 			vars.timeAdjProxy = vars.currntCamp - 1;
@@ -106,18 +149,23 @@ gameTime {
 	return TimeSpan.FromSeconds(System.Convert.ToDouble(vars.gtBuffer + vars.actIGT));
 }
 
+reset {
+	if (vars.actIGT < vars.lastIGT && vars.actIGT > 0 && vars.actSLT == 0) {
+		return true;
+	}
+}
+
 split {
-	if (vars.actIGT == 0 && 
+	//Chapter Split
+	if (settings["opt0"] == false &&
+		vars.actIGT == 0 && 
 		vars.actSLT == 0 && 
 		vars.lastIGT > vars.actIGT && 
 		vars.lastSLT > vars.actSLT &&
 		vars.timeProxy == vars.timeProxy2) {
 			return true;
 	}
-}
-
-reset {
-	if (vars.actIGT < vars.lastIGT && vars.actIGT > 0 && vars.actSLT == 0 && current.pCampaignDifficulty == 0) {
-		return true;
+	else {
+		return vars.currntLvlCheck;
 	}
 }
