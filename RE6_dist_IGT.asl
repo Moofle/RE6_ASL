@@ -92,7 +92,7 @@ update {
     	}
 
 		if (settings["opt0"] == true) {
-			if (current.pCurrntLvl != old.pCurrntLvl && vars.LvlMap.Contains(current.pCurrntLvl)) {
+			if (current.pCurrntLvl != old.pCurrntLvl && vars.LvlMap.Contains(current.pCurrntLvl) && vars.LvlMap.Contains(old.pCurrntLvl)) {
 				vars.currntLvlCheck = true;
 			}
 			else {
@@ -110,20 +110,20 @@ update {
 		vars.timeProxy = vars.mainSrcArray[vars.timeAdjProxy, 0];
 		vars.timeProxy2 = vars.pastSrcArray[vars.timeAdjProxy, 0];
 
-    	if (vars.currntCamp == vars.campCurrntSlctd[i] 
-			&& current.pSlctdPlyr == 0) {
-        	vars.actIGT = vars.mainSrcArray[i, 0];
-        	vars.actSLT = vars.mainSrcArray[i, 1];
-        	vars.lastIGT = vars.pastSrcArray[i, 0];
-        	vars.lastSLT = vars.pastSrcArray[i, 1];
-    	}
-    	else if (vars.currntCamp == vars.campCurrntSlctd[i] 
-				&& current.pSlctdPlyr == 1) {
-        	vars.actIGT = vars.mainSrcArray[i, 1];
-        	vars.actSLT = vars.mainSrcArray[i, 0];
-        	vars.lastIGT = vars.pastSrcArray[i, 1];
-        	vars.lastSLT = vars.pastSrcArray[i, 0];
-    	}
+		if (vars.currntCamp == vars.campCurrntSlctd[i]) {
+			if (current.pSlctdPlyr == 0) {
+				vars.actIGT = vars.mainSrcArray[i, 0];
+				vars.actSLT = vars.mainSrcArray[i, 1];
+				vars.lastIGT = vars.pastSrcArray[i, 0];
+				vars.lastSLT = vars.pastSrcArray[i, 1];
+			}
+			else if (current.pSlctdPlyr == 1) {
+				vars.actIGT = vars.mainSrcArray[i, 1];
+				vars.actSLT = vars.mainSrcArray[i, 0];
+				vars.lastIGT = vars.pastSrcArray[i, 1];
+				vars.lastSLT = vars.pastSrcArray[i, 0];
+			}
+		}
 	}
 }
 
@@ -157,7 +157,7 @@ reset {
 
 split {
 	//Chapter Split
-	if (settings["opt0"] == false &&
+	if (vars.currntLvlCheck == false &&
 		vars.actIGT == 0 && 
 		vars.actSLT == 0 && 
 		vars.lastIGT > vars.actIGT && 
