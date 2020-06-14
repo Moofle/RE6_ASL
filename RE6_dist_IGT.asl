@@ -64,6 +64,7 @@ startup {
 								574, 509, 516, 578, 
 								802, 871, 804, 
 								751, 706, 703, 702};
+	vars.FinalsMap = new List<int> {773, 903, 950, 702};
 	vars.currntLvlCheck = false;
 
 	settings.Add("optionals", false, "|---Optional Features---|");
@@ -95,9 +96,32 @@ update {
 			if (current.pCurrntLvl != old.pCurrntLvl && vars.LvlMap.Contains(current.pCurrntLvl) && vars.LvlMap.Contains(old.pCurrntLvl)) {
 				vars.currntLvlCheck = true;
 			}
+			else if (vars.currntLvlCheck == false && vars.FinalsMap.Contains(current.pCurrntLvl) &&
+					vars.actIGT == 0 && vars.actSLT == 0 && 
+					vars.lastIGT > vars.actIGT && vars.lastSLT > vars.actSLT &&
+					vars.timeProxy == vars.timeProxy2) {
+						vars.currntLvlCheck = true;
+			}
 			else {
 				vars.currntLvlCheck = false;
 			}
+		}
+		else if (settings["opt0"] == false) {
+			if (vars.actIGT == 0 && vars.actSLT == 0 && vars.lastIGT > vars.actIGT && vars.lastSLT > vars.actSLT && vars.timeProxy == vars.timeProxy2) {
+				vars.currntLvlCheck = true;
+			}
+			else {
+				vars.currntLvlCheck = false;
+			}
+		}
+
+		if (vars.currntLvlCheck == false &&
+		vars.actIGT == 0 && 
+		vars.actSLT == 0 && 
+		vars.lastIGT > vars.actIGT && 
+		vars.lastSLT > vars.actSLT &&
+		vars.timeProxy == vars.timeProxy2) {
+
 		}
 
 		if (vars.currntCamp == 3) {
@@ -156,16 +180,5 @@ reset {
 }
 
 split {
-	//Chapter Split
-	if (vars.currntLvlCheck == false &&
-		vars.actIGT == 0 && 
-		vars.actSLT == 0 && 
-		vars.lastIGT > vars.actIGT && 
-		vars.lastSLT > vars.actSLT &&
-		vars.timeProxy == vars.timeProxy2) {
-			return true;
-	}
-	else {
-		return vars.currntLvlCheck;
-	}
+	return vars.currntLvlCheck;
 }
