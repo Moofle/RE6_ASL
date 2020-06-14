@@ -46,7 +46,8 @@ startup {
 //Level maps for the campaigns. Should not include cutscenes, more to test.
 	vars.LvlMap = new List<int> {104, 105, 101, 102, 103, 
 								210, 200, 201, 202, 279, 209, 
-								203, 204, 206, 250, 
+								203, 
+								204, 206, 250, 
 								552, 510, 511, 512, 514, 
 								770, 701, 706, 702, 773, 
 								500, 501, 502, 503, 
@@ -64,7 +65,7 @@ startup {
 								574, 509, 516, 578, 
 								802, 871, 804, 
 								751, 706, 703, 702};
-	vars.FinalsMap = new List<int> {773, 903, 950, 702};
+	vars.BPMap = new List<int> {773, 903, 950, 702, 203};
 	vars.currntLvlCheck = false;
 
 	settings.Add("optionals", false, "|---Optional Features---|");
@@ -96,7 +97,7 @@ update {
 			if (current.pCurrntLvl != old.pCurrntLvl && vars.LvlMap.Contains(current.pCurrntLvl) && vars.LvlMap.Contains(old.pCurrntLvl)) {
 				vars.currntLvlCheck = true;
 			}
-			else if (vars.currntLvlCheck == false && vars.FinalsMap.Contains(current.pCurrntLvl) &&
+			else if (vars.currntLvlCheck == false && vars.BPMap.Contains(current.pCurrntLvl) &&
 					vars.actIGT == 0 && vars.actSLT == 0 && 
 					vars.lastIGT > vars.actIGT && vars.lastSLT > vars.actSLT &&
 					vars.timeProxy == vars.timeProxy2) {
