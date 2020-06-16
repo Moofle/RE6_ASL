@@ -67,6 +67,7 @@ startup {
 								751, 706, 703, 702};
 	vars.BPMap = new List<int> {773, 903, 950, 702, 203};
 	vars.currntLvlCheck = false;
+	vars.oPCL = 0;
 
 	settings.Add("optionals", false, "|---Optional Features---|");
 	settings.CurrentDefaultParent = "optionals";
@@ -94,7 +95,7 @@ update {
     	}
 
 		if (settings["opt0"] == true) {
-			if (current.pCurrntLvl != old.pCurrntLvl && vars.LvlMap.Contains(current.pCurrntLvl) && vars.LvlMap.Contains(old.pCurrntLvl)) {
+			if (current.pCurrntLvl != old.pCurrntLvl && vars.LvlMap.Contains(current.pCurrntLvl) && vars.LvlMap.Contains(vars.oPCL)) {
 				vars.currntLvlCheck = true;
 			}
 			else if (vars.currntLvlCheck == false && vars.BPMap.Contains(current.pCurrntLvl) &&
@@ -150,6 +151,8 @@ update {
 			}
 		}
 	}
+
+	vars.oPCL = old.pCurrntLvl;
 }
 
 start {
