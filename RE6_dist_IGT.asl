@@ -117,15 +117,6 @@ update {
 			}
 		}
 
-		if (vars.currntLvlCheck == false &&
-		vars.actIGT == 0 && 
-		vars.actSLT == 0 && 
-		vars.lastIGT > vars.actIGT && 
-		vars.lastSLT > vars.actSLT &&
-		vars.timeProxy == vars.timeProxy2) {
-
-		}
-
 		if (vars.currntCamp == 3) {
 			vars.timeAdjProxy = vars.currntCamp - 1;
 		}
